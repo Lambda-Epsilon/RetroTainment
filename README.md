@@ -1,8 +1,8 @@
 # LVGL on top of Linux graphics stack
 
 Example project to use LVGL on top of Linux graphics stack.
-Currently supported backends are either legacy framebuffer
-(fbdev), modern DRM/KMS, or SDL2.
+Currently supported backends are legacy framebuffer
+(fbdev), modern DRM/KMS, Wayland or SDL2.
 
 By default, legacy framebuffer backend uses `/dev/fb0` device node,
 DRM/KMS backend uses '/dev/dri/card0' card node, SDL2 uses window
@@ -16,18 +16,19 @@ https://blog.lvgl.io/2018-01-03/linux_fb
 Clone the LVGL Framebuffer Demo project and its related sub modules.
 
 ```
-git clone https://github.com/lvgl/lv_port_linux_frame_buffer.git
-cd lv_port_linux_frame_buffer/
+git clone https://github.com/lvgl/lv_port_linux.git
+cd lv_port_linux/
 git submodule update --init --recursive
 ```
 
-## Select graphics backend (optional)
+## Select graphics backend
 
 To use legacy framebuffer (fbdev) support, adjust `lv_conf.h` as follows:
 ```
 #define LV_USE_LINUX_FBDEV	1
 #define LV_USE_LINUX_DRM	0
 #define LV_USE_SDL		0
+#define LV_USE_WAYLAND		0
 ```
 
 To use modern DRM/KMS support, adjust `lv_conf.h` as follows:
@@ -35,6 +36,7 @@ To use modern DRM/KMS support, adjust `lv_conf.h` as follows:
 #define LV_USE_LINUX_FBDEV	0
 #define LV_USE_LINUX_DRM	1
 #define LV_USE_SDL		0
+#define LV_USE_WAYLAND		0
 ```
 
 To use SDL2 support, adjust `lv_conf.h` as follows:
@@ -42,21 +44,45 @@ To use SDL2 support, adjust `lv_conf.h` as follows:
 #define LV_USE_LINUX_FBDEV	0
 #define LV_USE_LINUX_DRM	0
 #define LV_USE_SDL		1
+#define LV_USE_WAYLAND		0
 ```
+
+To use wayland, adjust `lv_conf.h` as follows:
+```
+#define LV_USE_LINUX_FBDEV	0
+#define LV_USE_LINUX_DRM	0
+#define LV_USE_SDL		0
+#define LV_USE_WAYLAND		1
+```
+
+When using SDL2, wayland or libdrm the relevant option needs to be enabled in `CMakeLists.txt`
 
 ## Build the project
 
 ```
-mkdir build
-cd build 
-cmake ..
-make -j
+cmake -B build -S .
+make -C build -j 8
 ```
+
+## Command line options
+
+Command line options are used to modify behavior of the demo, they take precedence over environment variables.
+
+### Wayland
+
+- `-f` - enters fullscreen on startup
+- `-m` - maximizes window on startup
+- `-w <window width>` - set the width of the window
+- `-h <window height>` - set the height of the window
+
+### SDL2
+
+- `-w <window width>` - set the width of the window
+- `-h <window height>` - set the height of the window
 
 ## Environment variables
 
-Environment variables can be set to modify behavior of the demo.
-The following variables are supported.
+Environment variables can be set to modify the behavior of the demo.
 
 ### Legacy framebuffer (fbdev)
 
@@ -68,31 +94,42 @@ The following variables are supported.
 
 ### SDL2
 
-- `LV_SDL_VIDEO_WIDTH` - width of SDL2 surface (default `800`).
-- `LV_SDL_VIDEO_HEIGHT` - height of SDL2 surface (default `480`).
+- `LV_SIM_WINDOW_WIDTH` - width of SDL2 surface (default `800`).
+- `LV_SIM_WINDOW_HEIGHT` - height of SDL2 surface (default `480`).
+
+### Wayland
+
+- `LV_SIM_WINDOW_WIDTH` - width of the window (default `800`).
+- `LV_SIM_WINDOW_HEIGHT` - height of the window (default `480`).
+
 
 ## Run the demo application
 
-### As root
+### FBDEV
 
-Normal users don't have access to `/dev/fb0` so use `sudo` (or see below) : 
+Unpriviledged users don't have access to the framebuffer device `/dev/fb0`
+`sudo` or `su` must be used.
 
 ```
-cd ../bin
-sudo main
+sudo ./bin/lvglsim
 ```
 
-### Userland
-
-You can give a normal user access to the framebuffer by adding them to the `video` group : 
+Access to the framebuffer device can be granted by adding the unpriviledged user to the `video` group
 
 ```
 sudo adduser $USER video
 newgrp video
-cd ../bin
-./main
+./bin/lvglsim
 ```
 
-## Notes
+### Wayland/SDL2
 
-- The Makefile is broken right now, so Cmake shall be used.
+Starts the simulator using the default window width/height
+
+```
+./bin/lvglsim
+```
+
+## Notes/TODOs
+
+- The Makefile is broken right now, please use Cmake.
