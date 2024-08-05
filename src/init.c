@@ -79,13 +79,12 @@ void ui_init(void)
 
 void initialize_system()
 {
-    /*printf("Debug: System initializing...\n");*/
-    /*fflush(stdout);   <--use when emergency*/
-
     /*Init functions*/
 
     /*Config loading or creation*/
     config_setup();
+
+    /*Database initialization*/
 
     /*while(1) { */
         /* Event loop */
