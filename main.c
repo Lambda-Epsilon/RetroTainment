@@ -1,10 +1,10 @@
 #include "lvgl/lvgl.h"
-#include "lvgl/demos/lv_demos.h"
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "src/init.h"
 
 static const char *getenv_default(const char *name, const char *dflt)
 {
@@ -41,14 +41,17 @@ static void lv_linux_disp_init(void)
 
 int main(void)
 {
+    /*LVGL init*/
     lv_init();
 
     /*Linux display device init*/
     lv_linux_disp_init();
 
-    /*Create a Demo*/
-    lv_demo_widgets();
-    lv_demo_widgets_start_slideshow();
+    /*Logic init*/
+    initialize_system();
+
+    /*UI init*/
+    ui_init();
 
     /*Handle LVGL tasks*/
     while(1) {

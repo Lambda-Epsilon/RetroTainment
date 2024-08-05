@@ -10,7 +10,10 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 add_subdirectory(lvgl)
 target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR})
 
-add_executable(main main.c mouse_cursor_icon.c)
+# Collect all C files in the src directory
+file(GLOB SOURCES "src/*.c")
+
+add_executable(main main.c mouse_cursor_icon.c ${SOURCES})
 
 include(${CMAKE_CURRENT_LIST_DIR}/lvgl/tests/FindLibDRM.cmake)
 include_directories(${Libdrm_INCLUDE_DIRS})
