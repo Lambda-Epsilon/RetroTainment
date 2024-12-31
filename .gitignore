@@ -9,7 +9,7 @@ demo
 *.obj
 *.elf
 /build/
-/bin/
+#/bin/
 
 # Linker output
 *.ilk
